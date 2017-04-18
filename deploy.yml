@@ -1,0 +1,80 @@
+---
+- hosts: localhost
+  vars:
+    start_stop: started
+    absent_present: present
+  tasks:
+  - proxmox_kvm:
+      api_user    : root@pam
+      api_password: proXmoX
+      api_host    : pve.opsits.com
+      clone       : 'VMtemplate'
+      vmid        : '100'
+      newid       : '102'
+      name        : 'node1'  # The target VM name
+      node        : 'pve'
+      format      : raw
+      timeout     : 300  # Note: The task can take a while. Adapt
+  - proxmox_kvm:
+      api_user    : root@pam
+      api_password: proXmoX
+      api_host    : pve.opsits.com
+      clone       : 'VMtemplate'
+      vmid        : '100'
+      newid       : '103'
+      name        : 'node2'  # The target VM name
+      node        : 'pve'
+      format      : raw
+      timeout     : 300  # Note: The task can take a while. Adapt
+  - proxmox_kvm:
+      api_user    : root@pam
+      api_password: proXmoX
+      api_host    : pve.opsits.com
+      clone       : 'VMtemplate'
+      vmid        : '101'
+      newid       : '104'
+      name        : 'node3'  # The target VM name
+      node        : 'pve2'
+      format      : raw
+      timeout     : 300  # Note: The task can take a while. Adapt
+
+  - proxmox_kvm:
+      api_user    : root@pam
+      api_password: proXmoX
+      api_host    : pve.opsits.com
+      vmid        : '102'
+      state	  : '{{ start_stop }}'
+  - proxmox_kvm:
+      api_user    : root@pam
+      api_password: proXmoX
+      api_host    : pve.opsits.com
+      vmid        : '103'
+      state	  : '{{ start_stop }}'
+  - proxmox_kvm:
+      api_user    : root@pam
+      api_password: proXmoX
+      api_host    : pve.opsits.com
+      vmid        : '104'
+      state	  : '{{ start_stop }}'
+
+  - proxmox_kvm:
+      api_user    : root@pam
+      api_password: proXmoX
+      api_host    : pve.opsits.com
+      vmid        : '102'
+      node        : 'node1'
+      state	  : '{{ absent_present }}'
+  - proxmox_kvm:
+      api_user    : root@pam
+      api_password: proXmoX
+      api_host    : pve.opsits.com
+      vmid        : '103'
+      node        : 'node2'
+      state	  : '{{ absent_present }}'
+  - proxmox_kvm:
+      api_user    : root@pam
+      api_password: proXmoX
+      api_host    : pve.opsits.com
+      vmid        : '104'
+      node        : 'node3'
+      state	  : '{{ absent_present }}'

@@ -1,0 +1,53 @@
+---
+- hosts: all
+  become: true
+  become_user: root
+  tasks:
+  - name: create a reasonable resolv.conf
+    copy:
+      src: resolv.conf
+      dest: /etc/resolv.conf
+      mode: 0644
+  - name: unset selinux enforcement
+    command: setenforce 0
+  - name: set selinux to permissive
+    lineinfile:
+      dest: /etc/selinux/config
+      regexp: '^SELINUX=.*'
+      backrefs: yes
+      line: SELINUX=permissive
+  - name: update system ifcfg-eth0 file
+    copy:
+      src: ifcfg-eth0
+      dest: /etc/sysconfig/network-scripts/ifcfg-eth0
+      mode: 0755
+  - name: fix IP address based on inventory
+    lineinfile:
+      dest: /etc/sysconfig/network-scripts/ifcfg-eth0
+      regexp: '^IPADDR=.*'
+      backrefs: yes
+      line: 'IPADDR="{{hostvars[inventory_hostname_short].ip}}"'
+  - name: add default route
+    lineinfile:
+      dest: /etc/sysconfig/network
+      regexp: '^GATEWAY=.*'
+      backrefs: yes
+      insertafter: EOF
+      line: 'GATEWAY="{{ansible_default_ipv4.gateway}}"'
+  - name: fix hostname
+    lineinfile:
+      dest: /etc/hostname
+      regexp: '.*'
+      backrefs: yes
+      line: '{{inventory_hostname}}'
+  - name: reboot to force "correct" ip address
+    shell: sleep 2 && shutdown -r now "Ansible updates triggered"
+    async: 1
+    poll: 0
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: fix "actual" kargo inventory
+      template:
+        src: inventory.j2
+        dest: inventory/inventory

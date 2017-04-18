@@ -1,0 +1,28 @@
+# ## C nfigure 'ip' variable to bind kubernetes services on a
+# ## different ip than the default iface
+[all]
+{% for host in groups['all'] %}
+{{host}} ansible_ssh_host={{hostvars[host].ip}}
+{% endfor %}
+
+# ## configure a bastion host if your nodes are not directly reachable
+# bastion ansible_ssh_host=x.x.x.x
+
+[kube-master]
+{% for host in groups['all'] %}
+{{host}}
+{% endfor %}
+
+[etcd]
+{% for host in groups['all'] %}
+{{host}}
+{% endfor %}
+
+[kube-node]
+{% for host in groups['all'] %}
+{{host}}
+{% endfor %}
+
+[k8s-cluster:children]
+kube-node
+kube-master
