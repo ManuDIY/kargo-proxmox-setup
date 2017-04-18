@@ -16,6 +16,19 @@ parameters in order to create and start or stop and delete target vms.
 The Fix script will resolve a number of issues in the deployed VMs that will
 cause Kargo to crash.
 
+NOTE: It appears that the proxmox community code requires ansible 2.1 or greater 
+deployed via pip or easy_install.  Brew installed ansible does not seem to have
+the appropraite modules installed.  Using a virtualenv for this task is a 
+reasonable approach, and if you do, don't forget to also install the python
+netaddr module:
+
+```
+pip install virtualenv
+virtualenv .
+. bin/activate
+pip install ansible netaddr
+```
+
 First launch the deploy script (after you've created your template VM):
 
 ```
